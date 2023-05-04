@@ -22,20 +22,19 @@ app.get('/',(req,res) => {
     
     const connection = mysql.createConnection(config_connect)
     const query = util.promisify(connection.query).bind(connection)
-    console.log(query)
     query('INSERT INTO people(name_people) values ("Cleiton Franca Desafio FullCycle!!")')
      
     query('SELECT * FROM people')
      .then(result => {
-         console.log(result)
+         
          let html = result.map(item => {
             return `<li>${item.name_people}</li>`
-         }
-         ).join('')
+         }).join('')
+
          html = `<ul>${html}</ul>`         
 
-         res.send(top+html)
-     })
+         res.send(top+html)})
+    
      .catch(err => {
         res.send(top+`<h2>Erro ao buscar dados</h2> ${err.message}`)
      })
