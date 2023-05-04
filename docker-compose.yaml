@@ -1,0 +1,52 @@
+version: '3'
+
+services:
+    db_node:
+      build:
+        context: mysql
+        dockerfile: Dockerfile
+      image: cleitonfranca05/mysql
+      command: --innodb-use-native-aio=0
+      container_name: db_node
+      restart: always
+      tty: true
+      environment:
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_DATABASE=db_node   
+      volumes: 
+        - ./mysql/db/bddata:/var/lib/mysql
+      networks:
+        - nginx_node
+
+    nodejs:
+      build:
+        context: nodejs
+        dockerfile: Dockerfile
+      entrypoint: dockerize -wait tcp://db_node:3306 -timeout 50s node index.js
+      image: cleitonfranca05/nodejs
+      container_name: nodejs
+      tty: true
+      depends_on:
+        - db_node
+      volumes:
+        - ./nodejs/:/usr/src/app
+        - /usr/src/app/node_modules
+      ports:
+        - "3000:3000"
+      networks:
+        - nginx_node      
+
+    nginx:
+      build:
+        context: nginx
+        dockerfile: Dockerfile
+      image: cleitonfranca05/nginx
+      container_name: nginx
+      ports:
+      - "8080:80"
+      networks:
+        - nginx_node  
+
+networks:
+  nginx_node:
+    driver: bridge

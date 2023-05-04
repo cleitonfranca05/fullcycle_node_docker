@@ -1,0 +1,2 @@
+USE db_node;
+CREATE TABLE people (id INT NOT NULL AUTO_INCREMENT, name_people VARCHAR(255), PRIMARY KEY(id));
